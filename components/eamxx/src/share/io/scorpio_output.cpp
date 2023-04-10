@@ -604,16 +604,17 @@ void AtmosphereOutput::register_dimensions(const std::string& name)
     auto is_partitioned = m_io_grid->get_partitioned_dim_tag()==tags[i];
     if (tag_loc == m_dims.end()) {
       int tag_len = 0;
-      if(tags[i] == m_io_grid->get_partitioned_dim_tag()) {
+      if(is_partitioned) {
         // This is the dimension that is partitioned across ranks.
         tag_len = m_io_grid->get_partitioned_dim_global_size();
       } else {
         tag_len = layout.dim(i);
       }
 
-      if (tag_name=="ncol")
+      if (tag_name=="ncol") {
         tag_name += std::to_string(tag_len);
         print_proc0(m_comm,"REGISTER TAG: "+name+","+tag_name+","+std::to_string(tag_len));
+      }
 
       m_dims[tag_name] = std::make_pair(tag_len,is_partitioned);
     } else {
@@ -710,7 +711,20 @@ register_variables(const std::string& filename,
     const auto& layout = fid.get_layout();
     std::string units = to_string(fid.get_units());
     for (int i=0; i<fid.get_layout().rank(); ++i) {
-      const auto tag_name = get_nc_tag_name(layout.tag(i), layout.dim(i));
+      auto tag_name = get_nc_tag_name(layout.tag(i), layout.dim(i));
+
+      // Add ncol size to name
+      if (tag_name=="ncol") {
+        int tag_len = 0;
+        if(m_io_grid->get_partitioned_dim_tag()==layout.tag(i)) {
+          // This is the dimension that is partitioned across ranks.
+          tag_len = m_io_grid->get_partitioned_dim_global_size();
+        } else {
+          tag_len = layout.dim(i);
+        }
+        tag_name += std::to_string(tag_len);
+      }
+
       // Concatenate the dimension string to the io-decomp string
       io_decomp_tag += "-" + tag_name;
       // If tag==CMP, we already attached the length to the tag name
