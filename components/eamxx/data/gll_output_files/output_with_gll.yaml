@@ -4,10 +4,10 @@ filename_prefix: ${CASE}.scream.h0
 Averaging Type: Instant
 Max Snapshots Per File: 1
 Fields:
-  Physics GLL:
+  Physics ${PHYSICS_GRID_TYPE}:
     Field Names:
       - omega
-  Physics ${PHYSICS_GRID_TYPE}:
+  Physics GLL:
     Field Names:
       - omega
 output_control:

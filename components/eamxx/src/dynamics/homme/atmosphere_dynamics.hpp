@@ -85,6 +85,12 @@ protected:
   void fv_phys_rrtmgp_active_gases_init(const std::shared_ptr<const GridsManager>& gm);
   void fv_phys_rrtmgp_active_gases_remap();
 
+  // For runs on the PG2 grid, the user could request output of dynamics fields
+  // on the GLL grid. The following functions add these output fields to the FM
+  // and setup the appropriate remappers.
+  void add_gll_output_fields_to_fm () const;
+  void setup_dyn_to_gll_remapper () const;
+
   // Rayleigh friction functions
   void rayleigh_friction_init ();
   void rayleigh_friction_apply (const Real dt) const;

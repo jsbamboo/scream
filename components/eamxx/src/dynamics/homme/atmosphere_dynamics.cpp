@@ -196,8 +196,7 @@ void HommeDynamics::set_grids (const std::shared_ptr<const GridsManager> grids_m
     // This is needed for the dp_ref init in initialize_homme_state.
     add_field<Computed>("pseudo_density",FL({COL,     LEV},{nc,  nlev_mid}),Pa,    rgn,N);
 
-    // Homme fields for output on GLL nodes
-    add_field<Computed>("omega_GLL", FL({COL, LEV}, {nc, nlev_mid}), Pa/s, rgn, N);
+    add_gll_output_fields_to_fm();
   }
 
   // Dynamics grid states
@@ -381,10 +380,7 @@ void HommeDynamics::initialize_impl (const RunType run_type)
     fv_phys_initialize_impl();
 
     // Setup remapper for GLL output
-    m_d2cgll_remapper->registration_begins();
-    const auto& rgn = m_cgll_grid->name();
-    m_d2cgll_remapper->register_field(m_helper_fields.at("omega_dyn"), get_field_out("omega_gll"));
-    m_d2cgll_remapper->registration_ends();
+    setup_dyn_to_gll_remapper();
   } else {
     // Setup the p2d and d2p remappers
     m_p2d_remapper->registration_begins();
@@ -662,8 +658,10 @@ void HommeDynamics::homme_post_process (const double dt) {
     // Apply Rayleigh friction to update temperature and horiz_winds
     rayleigh_friction_apply(dt);
 
-    // Remap GLL output fields
-    m_d2cgll_remapper->remap(true);
+    // Remap GLL output fields if any have been registered
+    if(m_d2gll_remapper->get_num_field() > 0) {
+      m_d2cgll_remapper->remap(true);
+    }
 
     return;
   }
@@ -1301,6 +1299,39 @@ void HommeDynamics::update_pressure(const std::shared_ptr<const AbstractGrid>& g
     ColOps::compute_midpoint_values(team,nlevs,p_dry_int,p_dry_mid);
   });
 }
+
+void HommeDynamics::add_gll_output_fields_to_fm() const
+{
+  EKAT_ASSERT_MSG(fv_phys_active(), "Error! Adding GLL output fields here should "
+                                    "only occur during a run on Physics PG2.\n");
+
+  using namespace ShortFieldTagsNames;
+  using namespace ekat::units;
+  using FL  = FieldLayout;
+  constexpr int N   = HOMMEXX_PACK_SIZE;
+
+  const auto& rgn    = m_cgll_grid->name();
+  const auto ncol    = m_cgll_grid->get_num_local_dofs();
+  const int nlev_mid = m_cgll_grid->get_num_vertical_levels();
+
+  add_field<Computed>("omega_gll", FL({COL, LEV}, {ncol, nlev_mid}), Pa/s, rgn, N);
+
+  print_proc0(m_comm, "Added GLL fields to output.");
+}
+
+void HommeDynamics::setup_dyn_to_gll_remapper() const
+{
+  EKAT_ASSERT_MSG(fv_phys_active(), "Error! Setting up dyn to gll remmapper here should "
+                                    "only occur during a run on Physics PG2.\n");
+
+  m_d2cgll_remapper->registration_begins();
+  const auto& rgn = m_cgll_grid->name();
+  m_d2cgll_remapper->register_field(m_helper_fields.at("omega_dyn"), get_field_out("omega_gll"));
+  m_d2cgll_remapper->registration_ends();
+
+    print_proc0(m_comm, "Registered remapper.");
+}
+
 // =========================================================================================
 
 } // namespace scream
