@@ -243,7 +243,7 @@ void HommeDynamics::set_grids (const std::shared_ptr<const GridsManager> grids_m
     m_p2d_remapper = grids_manager->create_remapper(m_phys_grid,m_dyn_grid);
     m_d2p_remapper = grids_manager->create_remapper(m_dyn_grid,m_phys_grid);
   } else {
-    m_d2cgll_remapper = grids_manager->create_remapper(m_dyn_grid,m_cgll_grid);
+    m_d2gll_remapper = grids_manager->create_remapper(m_dyn_grid,m_cgll_grid);
   }
 
   // Create separate remapper for initial_conditions
@@ -659,8 +659,8 @@ void HommeDynamics::homme_post_process (const double dt) {
     rayleigh_friction_apply(dt);
 
     // Remap GLL output fields if any have been registered
-    if(m_d2gll_remapper->get_num_field() > 0) {
-      m_d2cgll_remapper->remap(true);
+    if(m_d2gll_remapper->get_num_fields() > 0) {
+      m_d2gll_remapper->remap(true);
     }
 
     return;
@@ -1300,7 +1300,7 @@ void HommeDynamics::update_pressure(const std::shared_ptr<const AbstractGrid>& g
   });
 }
 
-void HommeDynamics::add_gll_output_fields_to_fm() const
+void HommeDynamics::add_gll_output_fields_to_fm()
 {
   EKAT_ASSERT_MSG(fv_phys_active(), "Error! Adding GLL output fields here should "
                                     "only occur during a run on Physics PG2.\n");
@@ -1324,10 +1324,9 @@ void HommeDynamics::setup_dyn_to_gll_remapper() const
   EKAT_ASSERT_MSG(fv_phys_active(), "Error! Setting up dyn to gll remmapper here should "
                                     "only occur during a run on Physics PG2.\n");
 
-  m_d2cgll_remapper->registration_begins();
-  const auto& rgn = m_cgll_grid->name();
-  m_d2cgll_remapper->register_field(m_helper_fields.at("omega_dyn"), get_field_out("omega_gll"));
-  m_d2cgll_remapper->registration_ends();
+  m_d2gll_remapper->registration_begins();
+  m_d2gll_remapper->register_field(m_helper_fields.at("omega_dyn"), get_field_out("omega_gll"));
+  m_d2gll_remapper->registration_ends();
 
     print_proc0(m_comm, "Registered remapper.");
 }

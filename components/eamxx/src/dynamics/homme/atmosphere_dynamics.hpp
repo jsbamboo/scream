@@ -88,7 +88,7 @@ protected:
   // For runs on the PG2 grid, the user could request output of dynamics fields
   // on the GLL grid. The following functions add these output fields to the FM
   // and setup the appropriate remappers.
-  void add_gll_output_fields_to_fm () const;
+  void add_gll_output_fields_to_fm ();
   void setup_dyn_to_gll_remapper () const;
 
   // Rayleigh friction functions
@@ -136,7 +136,7 @@ protected:
   std::shared_ptr<AbstractRemapper>   m_ic_remapper;
 
   // TODO: add info, special remapper for phys cgll output in pg2 run
-  std::shared_ptr<AbstractRemapper>   m_d2cgll_remapper;
+  std::shared_ptr<AbstractRemapper>   m_d2gll_remapper;
 
 
   // The dynamics and reference grids
