@@ -599,11 +599,7 @@ void AtmosphereOutput::register_dimensions(const std::string& name)
     const auto& tags = layout.tags();
     const auto& dims = layout.dims();
 
-    // If field name has suffix _gll or _pg2, we will need 2 different
-    // versions of the ncol tag.
-    //if (tags[i] == ShortFieldTagsNames::COL )
-
-    const auto tag_name = get_nc_tag_name(tags[i],dims[i]);
+    auto tag_name = get_nc_tag_name(tags[i],dims[i]);
     auto tag_loc = m_dims.find(tag_name);
     auto is_partitioned = m_io_grid->get_partitioned_dim_tag()==tags[i];
     if (tag_loc == m_dims.end()) {
@@ -616,6 +612,7 @@ void AtmosphereOutput::register_dimensions(const std::string& name)
       }
 
       if (tag_name=="ncol")
+        tag_name += std::to_string(tag_len);
         print_proc0(m_comm,"REGISTER TAG: "+name+","+tag_name+","+std::to_string(tag_len));
 
       m_dims[tag_name] = std::make_pair(tag_len,is_partitioned);
