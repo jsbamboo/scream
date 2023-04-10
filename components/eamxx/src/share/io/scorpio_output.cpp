@@ -147,6 +147,10 @@ AtmosphereOutput (const ekat::Comm& comm, const ekat::ParameterList& params,
         "Error! Bad formatting of output yaml file. Missing 'Fields->$grid_name` sublist.\n");
   }
 
+  for (auto fname : m_fields_names) {
+    print_proc0(m_comm,"Constructor: "+fname);
+  }
+
   sort_and_check(m_fields_names);
 
   // Check if remapping and if so create the appropriate remapper
@@ -259,10 +263,6 @@ AtmosphereOutput (const ekat::Comm& comm, const ekat::ParameterList& params,
 
     // Reset the IO field manager
     set_field_manager(io_fm,"io");
-  }
-
-  for (auto fname : m_fields_names) {
-    print_proc0(m_comm,"Constructor: "+fname);
   }
 
   // Setup I/O structures
