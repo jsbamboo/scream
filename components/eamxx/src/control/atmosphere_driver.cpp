@@ -621,6 +621,7 @@ void AtmosphereDriver::initialize_output_managers () {
   const auto& output_yaml_files = io_params.get<vos_t>("output_yaml_files",vos_t{});
   int om_tally = 0;
   for (const auto& fname : output_yaml_files) {
+    print_proc0(m_atm_comm,"Driver init output mgr: "+fname);
     ekat::ParameterList params;
     ekat::parse_yaml_file(fname,params);
     // Check if the filename prefix for this file has already been set.  If not, use the simulation casename.
