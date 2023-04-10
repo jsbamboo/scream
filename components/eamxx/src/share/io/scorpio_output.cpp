@@ -148,7 +148,7 @@ AtmosphereOutput (const ekat::Comm& comm, const ekat::ParameterList& params,
   }
 
   for (auto fname : m_fields_names) {
-    print_proc0(m_comm,"Constructor: "+fname);
+    print_proc0(m_comm,"Constructor: "+fname+" on "+grids_mgr->name());
   }
 
   sort_and_check(m_fields_names);
