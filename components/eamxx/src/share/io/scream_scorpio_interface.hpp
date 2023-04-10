@@ -107,7 +107,7 @@ inline std::string get_nc_tag_name (const FieldTag& t, const int extent, const s
       name = "tl";
       break;
     case COL:
-      name = "ncol" + std::to_string(extent);
+      name = "ncol";
       break;
     case GP:
       name = "gp";
