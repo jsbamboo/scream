@@ -1314,7 +1314,7 @@ void HommeDynamics::add_gll_output_fields_to_fm()
   const auto ncol    = m_cgll_grid->get_num_local_dofs();
   const int nlev_mid = m_cgll_grid->get_num_vertical_levels();
 
-  add_field<Computed>("omega", FL({COL, LEV}, {ncol, nlev_mid}), Pa/s, rgn, N);
+  add_field<Computed>("omega_gll", FL({COL, LEV}, {ncol, nlev_mid}), Pa/s, rgn, N);
 
   print_proc0(m_comm, "Added GLL fields to output.");
 }
@@ -1326,7 +1326,7 @@ void HommeDynamics::setup_dyn_to_gll_remapper() const
 
   m_d2gll_remapper->registration_begins();
   const auto& rgn = m_cgll_grid->name();
-  m_d2gll_remapper->register_field(m_helper_fields.at("omega_dyn"), get_field_out("omega", rgn));
+  m_d2gll_remapper->register_field(m_helper_fields.at("omega_dyn"), get_field_out("omega_gll", rgn));
   m_d2gll_remapper->registration_ends();
 
     print_proc0(m_comm, "Registered remapper.");

@@ -9,7 +9,7 @@ Fields:
       - omega
   Physics GLL:
     Field Names:
-      - omega
+      - omega_gll
 output_control:
   Frequency: ${HIST_N}
   frequency_units: ${HIST_OPTION}
