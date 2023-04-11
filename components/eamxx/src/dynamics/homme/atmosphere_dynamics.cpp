@@ -1315,6 +1315,7 @@ void HommeDynamics::add_gll_output_fields_to_fm()
   const int nlev_mid = m_cgll_grid->get_num_vertical_levels();
 
   add_field<Computed>("omega_gll", FL({COL, LEV}, {ncol, nlev_mid}), Pa/s, rgn, N);
+  add_internal_field(m_helper_fields.at("omega_dyn"));
 
   print_proc0(m_comm, "Added GLL fields to output.");
 }
