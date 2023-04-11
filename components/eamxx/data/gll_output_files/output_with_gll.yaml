@@ -10,6 +10,10 @@ Fields:
   Physics GLL:
     Field Names:
       - omega_gll
+  Dynamics:
+    Field Names:
+      - omega_dyn
+    IO Grid Name: Physics GLL
 output_control:
   Frequency: ${HIST_N}
   frequency_units: ${HIST_OPTION}
